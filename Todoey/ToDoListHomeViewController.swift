@@ -10,13 +10,17 @@ import UIKit
 
 class ToDoListHomeViewController: UITableViewController {
 
-    var pendingItems = ["Learn AI from scratch", "iOS", "Resume building", "Learn Flutter", "Interview preparation", "DSA"]
+    var pendingItems :[String] = []
 
+    let defaults = UserDefaults.standard // store key value pairs consistently across the app
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.systemBackground
         title = "To Do List" // Navigation bar title
-
+        
+        //Load it from the userDefaults stored
+        pendingItems = defaults.object(forKey: "pendingItems") as? [String] ?? []
 
         // need to add a bar button item to add new tasks on Navigation bar
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewTask))
@@ -32,6 +36,9 @@ class ToDoListHomeViewController: UITableViewController {
             print("success")
          // using userEnteredTextField.text to get the text entered by the user
             self?.pendingItems.append(userEnteredTextField.text ?? "") // Append the new item to the pendingItems array
+            
+            // Adding to UserDefaults also ( saves in plist file )
+            self?.defaults.set(self?.pendingItems, forKey: "pendingItems")
             self?.tableView.reloadData() // Reload the table view to reflect the new item
         }
 
