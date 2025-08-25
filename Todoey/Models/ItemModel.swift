@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Item: Codable {
-    var text: String
-    var done: Bool = false
-}
+//struct Item: Codable {
+//    var text: String
+//    var done: Bool = false
+//}
