@@ -17,9 +17,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        // Tells to open ToDoListHomeViewController as the root view controller
+//        // Tells to open ToDoListHomeViewController as the root view controller
+//        window = UIWindow(frame: UIScreen.main.bounds)
+//        window?.rootViewController = UINavigationController(rootViewController: ToDoListHomeViewController())  // Set as root
+//        window?.makeKeyAndVisible()
+//
+        
+        // First we will show the category view controller like Shopping on click of that shopping we will open ToDoListViewController
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = UINavigationController(rootViewController: ToDoListHomeViewController())  // Set as root
+        window?.rootViewController = UINavigationController(rootViewController: CategoryViewController())
         window?.makeKeyAndVisible()
         
         //Path for UserDefaults .plist file -> needs simulator Id and App ID
