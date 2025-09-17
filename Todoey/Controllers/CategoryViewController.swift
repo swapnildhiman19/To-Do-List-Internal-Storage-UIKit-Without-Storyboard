@@ -9,7 +9,13 @@ import CoreData
 import Foundation
 import UIKit
 
+protocol CategoryViewControllerDelegate {
+    func categoryCellTapped(_ category: Category)
+}
+
 class CategoryViewController : UIViewController {
+    
+    var delegate: CategoryViewControllerDelegate?
     
     let tableView = UITableView()
     
@@ -99,6 +105,7 @@ class CategoryViewController : UIViewController {
 extension CategoryViewController : UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // Here we will call the Items which are in this category and open ToDoListViewController
+        delegate?.categoryCellTapped(categories[indexPath.row])
         
         tableView.deselectRow(at: indexPath, animated: true)
     }

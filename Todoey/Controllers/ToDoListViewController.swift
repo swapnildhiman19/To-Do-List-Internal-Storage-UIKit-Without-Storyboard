@@ -10,12 +10,23 @@ class ToDoListViewController: UITableViewController {
 
 //    var pendingItems :[String] = ["x","a","c","s","e","d","f","g","h","j","k","l","z","x","c","v","b","n","m"]
     var pendingItems: [Item] = [] // Item is now coming from CoreData
+    
+    var selectedCategory : Category
 
     // Reference the context from AppDelegate
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     let defaults = UserDefaults.standard // store key value pairs consistently across the app
-
+    
+    init(selectedCategory : Category){
+        self.selectedCategory = selectedCategory
+        super.init(style: .plain)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.systemBackground
@@ -132,7 +143,37 @@ class ToDoListViewController: UITableViewController {
         }
     }
 
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
+        
+        // let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory.name!)
+        
+        /*
+         The core of the issue is a strict type requirement for the `MATCHES` operator within `NSPredicate`.
+
+         1.  **What is `MATCHES`?**
+             *   `MATCHES` is an operator designed **exclusively for string comparison**. Its purpose is to evaluate if a string on the left-hand side conforms to a pattern (often using wildcards or regular expressions) on the right-hand side.
+             *   Because it is a string-specific tool, the value on its left side **must** be a `String`.
+
+         2.  **Why `parentCategory MATCHES %@` Fails:**
+             *   In your predicate, `parentCategory` is a key path that points to the entire `Category` `NSManagedObject`. It is a complex object, **not a `String`**.
+             *   You are providing an `NSManagedObject` to an operator (`MATCHES`) that strictly requires a `String`.
+             *   Core Data sees this invalid instruction and cannot translate it into a valid database query. It doesn't know how to perform a text-based match on an entire object record, so it crashes.
+
+         3.  **Why `parentCategory == %@` Works:**
+             *   The `==` operator is for checking equality. Its behavior is polymorphic; it changes based on the data types it's comparing.
+             *   When you use `==` to compare two `NSManagedObject` instances in a predicate, you are not comparing their properties (like the `name`). Instead, you are asking Core Data to perform an **identity check**.
+             *   Core Data translates this to a query that compares the unique `NSManagedObjectID` of the objects. It's asking the database, "Find all `Item` rows where the foreign key for the category relationship points to the exact same `Category` row as the one provided." This is the most direct, efficient, and correct way to filter by a relationship.
+         */
+        let categoryPredicate = NSPredicate(format: "parentCategory == %@", selectedCategory)
+        
+        if let additionalPredicate = predicate {
+            // coming from search, need to combine this additionalPredicate with our categoryPredicate
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate,additionalPredicate])
+        } else {
+            request.predicate = categoryPredicate
+        }
+        
+        
         do {
             pendingItems = try context.fetch(request)
             tableView.reloadData()
@@ -155,6 +196,8 @@ class ToDoListViewController: UITableViewController {
             let newItem = Item(context: context)
             newItem.text = text
             newItem.done = false
+            // now need to set the entity relationship also
+            newItem.parentCategory = selectedCategory
 //            self.pendingItems.append(newItem) : Context sambhaal lega loadItems ke time
             self.saveItems()
             self.loadItems()
@@ -229,7 +272,7 @@ extension ToDoListViewController: UISearchBarDelegate {
         
         request.sortDescriptors = [NSSortDescriptor(key: "text", ascending: true)]
         
-        loadItems(with: request)
+        loadItems(with: request, predicate: request.predicate)
         
         // To dismiss the keyboard
         searchBar.resignFirstResponder()
@@ -292,3 +335,5 @@ extension ToDoListViewController: UISearchBarDelegate {
      */
     
 }
+
+

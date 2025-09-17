@@ -24,9 +24,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //
         
         // First we will show the category view controller like Shopping on click of that shopping we will open ToDoListViewController
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = UINavigationController(rootViewController: CategoryViewController())
-        window?.makeKeyAndVisible()
+//        window = UIWindow(frame: UIScreen.main.bounds)
+//        window?.rootViewController = UINavigationController(rootViewController: CategoryViewController())
+//        window?.makeKeyAndVisible()
+        
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        let navigationController = UINavigationController()
+        
+        let mainCoordinator = MainCoordinator(navigationController: navigationController)
+        mainCoordinator.start()
+        
+        window.rootViewController = navigationController
+        window.makeKeyAndVisible()
+        self.window = window
         
         //Path for UserDefaults .plist file -> needs simulator Id and App ID
         print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
