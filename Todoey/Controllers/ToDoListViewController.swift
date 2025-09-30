@@ -31,7 +31,13 @@ class ToDoListViewController: UITableViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor.systemBackground
         title = "To Do List" // Navigation bar title
-
+        
+//        if let colorHex = selectedCategory.colorHex {
+//            let color = UIColor.fromHexString(colorHex)
+//            navigationController?.navigationBar.backgroundColor = color
+//        }
+//        
+        
         // Add Search Bar UI
         let searchBar = UISearchBar()
         searchBar.delegate = self
@@ -46,8 +52,8 @@ class ToDoListViewController: UITableViewController {
         //  pendingItems = ["x","a","c","s","e","d","f","g","h","j","k","l","z","x","c","v","b","n","m"]: Issue with this approach is if we are using reusable cell and the checkmark property is assigned to cell that's why when there are lot of rows in the table view and you have checked item at top then when you scroll at bottom you will see another cell of same checked state, if you use UITableViewCell() once the cell disappears from the top while scrolling it comes to bottom and when we go up again it get's reintialized, we need a value of checkmark related to it's own data Model and not to a cell which is getting reused everytime. TableView only stores the memory of the cell which are visible
 
         // Rather than using UserDefaults we can make our own custom plist to store the Item Model using NSCoder
-        let dataFile = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("pendingItems.plist")
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        // let dataFile = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("pendingItems.plist")
+        // print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
 
         // need to add a bar button item to add new tasks on Navigation bar
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewTask))
@@ -215,8 +221,23 @@ class ToDoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
         let item = pendingItems[indexPath.row]
+        // Get the parent category color
+        if let hex = item.parentCategory?.colorHex {
+            let baseColor = UIColor.fromHexString(hex)
+            // Calculate color step (darkest is 0.7 x brightness, lightest is 1.0)
+            let itemCount = max(pendingItems.count - 1, 1)
+            let percent = CGFloat(indexPath.row) / CGFloat(itemCount)
+            let cellColor = baseColor.adjusted(brightness: 0.7 + 0.3 * percent)
+            cell.backgroundColor = cellColor
+            // Set text color for contrast if needed
+            cell.textLabel?.textColor = .white
+        }
         cell.textLabel?.text = item.text
         cell.accessoryType = item.done ? .checkmark : .none
+        
+        
+        cell.tintColor = .white
+
         return cell
     }
 

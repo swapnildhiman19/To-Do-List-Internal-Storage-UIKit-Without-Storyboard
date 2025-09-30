@@ -72,6 +72,8 @@ class CategoryViewController : UIViewController {
             guard let self = self, let text = enteredTextField.text, !text.isEmpty else { return }
             let newCategory = Category(context: context)
             newCategory.name = enteredTextField.text
+            let color = UIColor.randomFlat()
+            newCategory.colorHex = color.toHexString() //Persist the assigned color
             saveItems()
         }
         
@@ -123,7 +125,11 @@ extension CategoryViewController : UITableViewDataSource {
         if #available(iOS 14.0, *) {
             var config = cell.defaultContentConfiguration()
             config.text = category.name
+            config.textProperties.color = .white
             cell.contentConfiguration = config
+            if let hex = category.colorHex {
+                cell.backgroundColor = UIColor.fromHexString(hex)
+            }
         } else {
             // Fallback on earlier versions
         }
