@@ -32,12 +32,7 @@ class ToDoListViewController: UITableViewController {
         view.backgroundColor = UIColor.systemBackground
         title = "To Do List" // Navigation bar title
         
-//        if let colorHex = selectedCategory.colorHex {
-//            let color = UIColor.fromHexString(colorHex)
-//            navigationController?.navigationBar.backgroundColor = color
-//        }
-//        
-        
+                
         // Add Search Bar UI
         let searchBar = UISearchBar()
         searchBar.delegate = self
@@ -58,6 +53,26 @@ class ToDoListViewController: UITableViewController {
         // need to add a bar button item to add new tasks on Navigation bar
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewTask))
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let colorHex = selectedCategory.colorHex, let navBar = navigationController?.navigationBar {
+            let color = UIColor.fromHexString(colorHex)
+            
+            title = selectedCategory.name
+
+            // iOS 13+ style (modern way)
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = color
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+            navBar.standardAppearance = appearance
+            navBar.scrollEdgeAppearance = appearance
+            navBar.tintColor = UIColor.white // For bar button items
+        }
+    }
+
     /*
     When using UserDefaults way of storing the data
 

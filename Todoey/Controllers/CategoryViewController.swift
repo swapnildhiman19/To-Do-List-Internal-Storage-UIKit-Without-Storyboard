@@ -39,6 +39,23 @@ class CategoryViewController : UIViewController {
         constructView()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        if  let navBar = navigationController?.navigationBar {
+            let color = UIColor.fromHexString("1D9BF6")
+            
+            // iOS 13+ style (modern way)
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = color
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+            navBar.standardAppearance = appearance
+            navBar.scrollEdgeAppearance = appearance
+            navBar.tintColor = UIColor.white // For bar button items
+        }
+
+    }
+    
     private func constructView(){
         view.addSubview(tableView)
         tableView.dataSource = self
