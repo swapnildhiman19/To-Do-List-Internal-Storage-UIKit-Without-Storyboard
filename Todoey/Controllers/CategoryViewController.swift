@@ -129,4 +129,16 @@ extension CategoryViewController : UITableViewDataSource {
         }
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath){
+        if editingStyle == .delete {
+            let categoryToDelete = categories[indexPath.row]
+            /*
+             Since in CoreData we have set the "Delete Rule" for this relationship,  to "Cascade" (not Nullify or Deny).
+             This tells Core Data: when you delete a category, all connected items (Item.parentCategory == yourCategory) are also deleted from the persistent store.
+             */
+            context.delete(categoryToDelete)
+            saveItems()
+        }
+    }
 }
